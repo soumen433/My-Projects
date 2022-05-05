@@ -1,4 +1,3 @@
-const mongoose = require("mongoose");
 
 //Validating functions -
 const isValid = function (value) {
