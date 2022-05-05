@@ -36,12 +36,17 @@ const createIntern = async function(req,res){
       if(intern.mobile.length !== 10){
           return res.send({status:false , message: "mobile number is required 10 digit"})
       }
+
+      if(!/^\+?([0-9]{2})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/.test(mobile)){
+        return res.status(400).send({status:false, message:"give proper mobile no. in form of number"})
+      }
       
       let mob = await internModel.findOne({mobile: intern.mobile })
 
       if(mob !== null){
           return res.status(400).send({status:false, Message:`${mobile} mobile already use`})
       }
+
      // if (intern.collegeId.length !== 24){
       //  return res.status(400).send({status:false, message:"invalid college Id"})
       if(!validator.isValid(collegeName)){

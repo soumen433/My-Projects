@@ -33,7 +33,7 @@ const createCollege = async function (req, res) {
             return res.status(400).send({ status: false, message: "logoLink is required" })
         }
 
-        if(! (/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/.test(college.logoLink))){
+        if(! (/https?:\/\/(www\.)?[-a-zA-Z0-9@:%.\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%\+.~#?&//=]*)/.test(college.logoLink))){
             return res.status(400).send({ status: false, message: 'Please provide valid URL' })
         }
 
