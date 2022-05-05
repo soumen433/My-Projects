@@ -32,4 +32,20 @@ catch(err){
 }
 
 
+const getCollege = async function(req,res){
+
+    const cName = req.query.collegeName
+
+
+    const college = await collegeModel.find({cName})
+    if(!cName){
+        return res.status(400).send({status:false , message: " college Data are not Pesent"})
+    }
+
+    let collegewithintern = await collegeModel.find().populate('intern')
+    res.status(200).send({data : college})
+}
+
+
 module.exports.createCollege = createCollege
+module.exports.getCollege = getCollege

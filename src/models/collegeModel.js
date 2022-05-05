@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const collegeSchema = new mongoose.Schema( {
     name: { type : String, required: true, unique: true}, 
     fullName: {type: String, required:true}, 
-    logoLink: {type: String, required:true, },      //ref:links
+    logoLinks: {type: String, required:true, },      //ref:links
     isDeleted: {type:Boolean, default: false}
 },{ timestamps: true });
 
