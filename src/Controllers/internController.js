@@ -9,7 +9,7 @@ const route = require("../models/internModel");
 const createIntern = async function(req,res){
     let intern = req.body
 
-    const{email , mobile, name , collegeId} = intern;
+    const{email , mobile, name ,  collegeName} = intern;
 
     if(!validator.isValid(name)){
         return res.status(400).send({status:false, message: "Name is require"});
@@ -42,19 +42,27 @@ const createIntern = async function(req,res){
       if(mob !== null){
           return res.status(400).send({status:false, Message:`${mobile} mobile already use`})
       }
-      if (intern.collegeId.length !== 24){
-        return res.status(400).send({status:false, message:"invalid college Id"})
+     // if (intern.collegeId.length !== 24){
+      //  return res.status(400).send({status:false, message:"invalid college Id"})
+      if(!validator.isValid(collegeName)){
+        return res.status(400).send({status:false, message: " College Name is require"});
+    }
+   // }
+   //if(!collegeName) return res.status(400).send({status:false,message:"College Name Must Require"})
+
+      let iscollegeId  = await collegeModel.findOne({name: intern.collegeName}).select({_id:1})
+      if(! iscollegeId){
+        return res.status(400).send({status:false, message: "college name not exist"})
     }
 
-      let iscollegeId  = await collegeModel.findById({ _id : intern.collegeId })
-      if(! iscollegeId){
-          return res.status(400).send({status:false, message: "college Id not exist"})
-      }
+      let id=iscollegeId._id.toString()
+     intern.collegeId=id
+     delete intern.collegeName
+     // console.log(intern)
 
 
-
-    let internCreate = await internModel.create(intern)
-    res.status(201).send({status:true, intern:internCreate})
+   let internCreate = await internModel.create(intern)
+    res.status(201).send({status:true, data:internCreate})
 }
 
 module.exports.createIntern = createIntern;
