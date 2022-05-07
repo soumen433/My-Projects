@@ -6,68 +6,61 @@ const validator = require("../util/validator")
 const route = require("../models/internModel");
 
 
-const createIntern = async function(req,res){
-    let intern = req.body
+const createIntern = async function (req, res) {
+  let intern = req.body
 
-    const{email , mobile, name ,  collegeName} = intern;
+  const { email, mobile, name, collegeName } = intern;
 
-    if(!validator.isValid(name)){
-        return res.status(400).send({status:false, message: "Name is require"});
-    }
+  if (!validator.isValid(name)) {
+    return res.status(400).send({ status: false, message: "invalid name" });
+  }
 
+  if (!validator.isValid(mobile)) return res.status(400).send({ status: false, msg: "mobile number require" })
 
-    if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
-        res.status(400).send({status: false,message: `Email should be a valid email address`});
-        return;
-      }
+  let validMob = /^[6-9]\d{9}$/
+  if (!validMob.test(mobile)) {
+    return res.status(400).send({ status: false, message: "invalid mobile number" })
+  }
 
+  let mob = await internModel.findOne({ mobile: intern.mobile })
 
-      const isEmailAlredyUsed = await internModel.findOne({ email });
-      if (isEmailAlredyUsed) {
-        return res
-          .status(400)
-          .send({
-            status: false,
-            message: `${email} email address is already registered`,
-          });
-      }
+  if (mob !== null) {
+    return res.status(400).send({ status: false, Message: `${mobile} mobile already used` })
+  }
 
+  if (!validator.isValid(email)) {
+    return res.status(400).send({ status: false, message: "Email must require" });
+  }
 
-      if(intern.mobile.length !== 10){
-          return res.send({status:false , message: "mobile number is required 10 digit"})
-      }
+  let validEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
 
-      if(!/^\+?([0-9]{2})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/.test(mobile)){
-        return res.status(400).send({status:false, message:"give proper mobile no. in form of number"})
-      }
-      
-      let mob = await internModel.findOne({mobile: intern.mobile })
+  if (!validEmail.test(email)) {
+    res.status(400).send({ status: false, message: `Email should be a valid email address` });
+    return;
+  }
 
-      if(mob !== null){
-          return res.status(400).send({status:false, Message:`${mobile} mobile already use`})
-      }
+  const isEmailAlredyUsed = await internModel.findOne({ email });
+  if (isEmailAlredyUsed) {
+    return res
+      .status(400)
+      .send({
+        status: false,
+        message: `${email} email address is already registered`,
+      });
+  }
 
-     // if (intern.collegeId.length !== 24){
-      //  return res.status(400).send({status:false, message:"invalid college Id"})
-      if(!validator.isValid(collegeName)){
-        return res.status(400).send({status:false, message: " College Name is require"});
-    }
-   // }
-   //if(!collegeName) return res.status(400).send({status:false,message:"College Name Must Require"})
+  if (!validator.isValid(collegeName)) return req.status(400).send({ status: false, msg: "college name require" })
 
-      let iscollegeId  = await collegeModel.findOne({name: intern.collegeName}).select({_id:1})
-      if(! iscollegeId){
-        return res.status(400).send({status:false, message: "college name not exist"})
-    }
+  let iscollegeId = await collegeModel.findOne({ name: intern.collegeName }).select({ _id: 1 })
 
-      let id=iscollegeId._id.toString()
-     intern.collegeId=id
-     delete intern.collegeName
-     // console.log(intern)
-
-
-   let internCreate = await internModel.create(intern)
-    res.status(201).send({status:true, data:internCreate})
+  if (!iscollegeId)  return res.status(400).send({ status: false, message: "college name not exist" })
+  
+  let id = iscollegeId._id
+  intern.collegeId = id
+  delete intern.collegeName
+  
+  let internCreate = await internModel.create(intern)
+  res.status(201).send({ status: true, data: internCreate })
 }
 
 module.exports.createIntern = createIntern;
